@@ -44,19 +44,25 @@ class NN:
         costs = []
         for epoch in range(epochs):
             # forward pass
-            net_u = X.dot(self.V) + self.V0
-            H = sigmoid(net_u)
-            net_z = H.dot(self.W) + self.W0
-            O = sigmoid(net_z)
+            net_u, H, net_z, O = self.forwardPass(X)
 
+            # backpropogation
             self.backpropagate(O, t, X, H, net_z, net_u)
 
-            #find the cost function
+            # find the cost function
             if epoch % 10 == 0:
                 loss = np.square(np.subtract(t,O)).mean() 
                 costs.append(loss)
 
         return costs
+    
+    def forwardPass(self, X):
+        net_u = X.dot(self.V) + self.V0
+        H = sigmoid(net_u)
+        net_z = H.dot(self.W) + self.W0
+        O = sigmoid(net_z)
+
+        return net_u, H, net_z, O
 
     def backpropagate(self, O, t, X, H, net_z, net_u):
         error_output = O - t
