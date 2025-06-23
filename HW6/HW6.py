@@ -87,10 +87,10 @@ def NET(set, test, n_hidden_neurons=5, title=""):
 
     y_pred = nn.predict(test[0])
     acc = accuracy(test[1], y_pred)
-    print("Accuracy: ", acc)
+    print(f"{title} - Accuracy: {acc:.2f}")
 
     plt.plot(cost)
-    plt.title(title)
+    plt.title(f"{title} - Accuracy: {acc:.2f}")
     plt.ylabel("Error")
     plt.xlabel("Epochs")
     plt.show()
@@ -135,13 +135,19 @@ if __name__ == "__main__":
     set1_test = (X1_test, t1_test)
     set2_test = (X2_test, t2_test)
 
-    visualizeData(X1, t1, "Versicolor vs Virginica with sepal features", ("Versicolor", "Virginica"))
-    visualizeData(X2, t2, "Setosa vs Virginica with petal features", ("Setosa", "Virginica"))
+    # visualizeData(X1, t1, "Versicolor vs Virginica (sepal features)", ("Versicolor", "Virginica"))
+    # visualizeData(X2, t2, "Setosa vs Virginica (petal features)", ("Setosa", "Virginica"))
 
     # NET 1
-    NET(set1, set1_test, "Virginica vs Versicolor using sepal features")
-    NET(set2, set2_test, "Setosa vs Versicolor using petal features")
+    NET(set1, set1_test, 5, title="NET1: Versicolor vs Virginica (sepal features)")
+    NET(set2, set2_test, 5, title="NET1: Setosa vs Virginica (petal features)")
 
     # NET 2
-    NET(set1, set1_test, 20, title="Virginica vs Versicolor using sepal features")
-    NET(set2, set2_test, 20, title="Setosa vs Versicolor using petal features")
+    NET(set1, set1_test, 20, title="NET2: Versicolor vs Virginica (sepal features)")
+    NET(set2, set2_test, 20, title="NET2: Setosa vs Virginica (petal features)")
+
+    # NET 3
+
+
+    # NET 4
+
