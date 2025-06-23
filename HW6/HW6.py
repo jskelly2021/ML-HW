@@ -26,25 +26,26 @@ def function_derivative(z):
 
 
 class NN:
-    def __init__(self, features, hidden_neurons, output_neurons, learning_rate):
+    def __init__(self, features, hidden_layers, output_neurons, learning_rate):
         self.features = features
-        self.hidden_neurons = hidden_neurons
+        self.hidden_layers = hidden_layers
         self.output_neurons = output_neurons
         self.learning_rate = learning_rate
 
         # initialize weights
-        self.V = np.random.randn(self.features, self.hidden_neurons)
-        self.W = np.random.randn(self.hidden_neurons, self.output_neurons)
+        self.W = []
+        self.b = []
 
-        # initialize biases: 0
-        self.V0 = np.zeros((self.hidden_neurons))
-        self.W0 = np.zeros((self.output_neurons))
+        layer_sizes = [features] + hidden_layers + [output_neurons]
+        for i in range(len(layer_sizes) - 1):
+            self.W.append(np.random.randn(layer_sizes[i], layer_sizes[i+1]))
+            self.b.append(np.zeros(layer_sizes[i+1]))
 
     def train(self, X, t, epochs=1000):
         costs = []
         for epoch in range(epochs):
             # forward pass
-            net_u, H, net_z, O = self.forwardPass(X)
+            net, activations = self.forwardPass(X)
 
             # backpropogation
             self.backpropagate(O, t, X, H, net_z, net_u)
@@ -55,14 +56,20 @@ class NN:
                 costs.append(loss)
 
         return costs
-    
-    def forwardPass(self, X):
-        net_u = X.dot(self.V) + self.V0
-        H = sigmoid(net_u)
-        net_z = H.dot(self.W) + self.W0
-        O = sigmoid(net_z)
 
-        return net_u, H, net_z, O
+    def forwardPass(self, X):
+        n_layers = len(self.W)
+        nets = []
+        activations = [X]
+
+        a = X
+        for i in range(n_layers):
+            z = a.dot(self.W[i]) + self.b[i]
+            a = sigmoid(z)
+            nets.append(z)
+            activations.append(a)
+
+        return nets, activations
 
     def backpropagate(self, O, t, X, H, net_z, net_u):
         error_output = O - t
@@ -147,15 +154,16 @@ if __name__ == "__main__":
     # visualizeData(X2, t2, "Setosa vs Virginica (petal features)", ("Setosa", "Virginica"))
 
     # NET 1
-    NET(set1, set1_test, 5, title="NET1: Versicolor vs Virginica (sepal features)")
-    NET(set2, set2_test, 5, title="NET1: Setosa vs Virginica (petal features)")
+    # NET(set1, set1_test, n_hidden_neurons=5, title="NET1: Versicolor vs Virginica (sepal features)")
+    # NET(set2, set2_test, n_hidden_neurons=5, title="NET1: Setosa vs Virginica (petal features)")
 
     # NET 2
-    NET(set1, set1_test, 20, title="NET2: Versicolor vs Virginica (sepal features)")
-    NET(set2, set2_test, 20, title="NET2: Setosa vs Virginica (petal features)")
+    # NET(set1, set1_test, n_hidden_neurons=20, title="NET2: Versicolor vs Virginica (sepal features)")
+    # NET(set2, set2_test, n_hidden_neurons=20, title="NET2: Setosa vs Virginica (petal features)")
 
     # NET 3
-
+    NET(set1, set1_test, n_hidden_neurons=5, title="NET3: Versicolor vs Virginica (sepal features)")
+    NET(set2, set2_test, n_hidden_neurons=5, title="NET3: Setosa vs Virginica (petal features)")
 
     # NET 4
 
