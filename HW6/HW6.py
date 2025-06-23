@@ -45,25 +45,24 @@ class NN:
         costs = []
         for epoch in range(epochs):
             # forward pass
-            net, activations = self.forwardPass(X)
+            nets, activations = self.forwardPass(X)
 
             # backpropogation
-            self.backpropagate(O, t, X, H, net_z, net_u)
+            self.backpropagate(X, t, nets, activations)
 
             # find the cost function
             if epoch % 10 == 0:
-                loss = np.square(np.subtract(t,O)).mean() 
+                loss = np.square(np.subtract(t, activations[-1])).mean() 
                 costs.append(loss)
 
         return costs
 
     def forwardPass(self, X):
-        n_layers = len(self.W)
         nets = []
         activations = [X]
 
         a = X
-        for i in range(n_layers):
+        for i in range(len(self.W)):
             z = a.dot(self.W[i]) + self.b[i]
             a = sigmoid(z)
             nets.append(z)
@@ -71,33 +70,32 @@ class NN:
 
         return nets, activations
 
-    def backpropagate(self, O, t, X, H, net_z, net_u):
-        error_output = O - t
+    def backpropagate(self, X, t, nets, activations):
+        deltas = [None] * len(self.W)
+        deltas[-1] = (activations[-1] - t) * function_derivative(nets[-1])
 
-        d_W = H.T.dot(error_output * function_derivative(net_z))
-        d_W0 = np.sum(error_output * function_derivative(net_z), axis=0)
+        for i in reversed(range(len(self.W) - 1)):
+            deltas[i] = function_derivative(nets[i]) * deltas[i+1].dot(self.W[i+1].T)
 
-        error_hidden_layer = error_output.dot(self.W.T) * function_derivative(net_u)
-        d_V = X.T.dot(error_hidden_layer)
-        d_V0 = np.sum(error_hidden_layer, axis=0)
+        for i in range(len(self.W)):
+            d_W = activations[i].T.dot(deltas[i])
+            d_b = np.sum(deltas[i], axis=0)
 
-        # update weights and biases
-        self.W -= self.learning_rate * d_W
-        self.W0 -= self.learning_rate * d_W0
-        self.V -= self.learning_rate * d_V
-        self.V0 -= self.learning_rate * d_V0
+            self.W[i] -= self.learning_rate * d_W
+            self.b[i] -= self.learning_rate * d_b
+
 
     def predict(self, X):
-        net_u = X.dot(self.V) + self.V0
-        H = sigmoid(net_u)
-        net_z = H.dot(self.W) + self.W0
-        O = sigmoid(net_z)
+        a = X
+        for i in range(len(self.W)):
+            z = a.dot(self.W[i]) + self.b[i]
+            a = sigmoid(z)
 
-        return (O > 0.5).astype(int)
+        return (a > 0.5).astype(int)
 
 
-def NET(set, test, n_hidden_neurons=5, title=""):
-    nn = NN(features=2, hidden_neurons=n_hidden_neurons, output_neurons=1, learning_rate=0.01)
+def NET(set, test, hidden_layers, title=""):
+    nn = NN(features=2, hidden_layers=hidden_layers, output_neurons=1, learning_rate=0.01)
     cost = nn.train(set[0], set[1])
 
     y_pred = nn.predict(test[0])
@@ -154,16 +152,18 @@ if __name__ == "__main__":
     # visualizeData(X2, t2, "Setosa vs Virginica (petal features)", ("Setosa", "Virginica"))
 
     # NET 1
-    # NET(set1, set1_test, n_hidden_neurons=5, title="NET1: Versicolor vs Virginica (sepal features)")
-    # NET(set2, set2_test, n_hidden_neurons=5, title="NET1: Setosa vs Virginica (petal features)")
+    # NET(set1, set1_test, hidden_layers=[5], title="NET1: Versicolor vs Virginica (sepal features)")
+    # NET(set2, set2_test, hidden_layers=[5], title="NET1: Setosa vs Virginica (petal features)")
 
     # NET 2
-    # NET(set1, set1_test, n_hidden_neurons=20, title="NET2: Versicolor vs Virginica (sepal features)")
-    # NET(set2, set2_test, n_hidden_neurons=20, title="NET2: Setosa vs Virginica (petal features)")
+    # NET(set1, set1_test, hidden_layers=[20], title="NET2: Versicolor vs Virginica (sepal features)")
+    # NET(set2, set2_test, hidden_layers=[20], title="NET2: Setosa vs Virginica (petal features)")
 
     # NET 3
-    NET(set1, set1_test, n_hidden_neurons=5, title="NET3: Versicolor vs Virginica (sepal features)")
-    NET(set2, set2_test, n_hidden_neurons=5, title="NET3: Setosa vs Virginica (petal features)")
+    # NET(set1, set1_test, hidden_layers=[10, 5], title="NET3: Versicolor vs Virginica (sepal features)")
+    # NET(set2, set2_test, hidden_layers=[10, 5], title="NET3: Setosa vs Virginica (petal features)")
 
     # NET 4
+    NET(set1, set1_test, hidden_layers=[5], title="NET4: Versicolor vs Virginica (sepal features)")
+    NET(set2, set2_test, hidden_layers=[5], title="NET4: Setosa vs Virginica (petal features)")
 
