@@ -49,21 +49,7 @@ class NN:
             net_z = H.dot(self.W) + self.W0
             O = sigmoid(net_z)
 
-            # backpropagation pass
-            error_output = O - t
-
-            d_W = H.T.dot(error_output * function_derivative(net_z))
-            d_W0 = np.sum(error_output * function_derivative(net_z), axis=0)
-
-            error_hidden_layer = error_output.dot(self.W.T) * function_derivative(net_u)
-            d_V = X.T.dot(error_hidden_layer)
-            d_V0 = np.sum(error_hidden_layer, axis=0)
-
-            # update weights and biases
-            self.W -= self.learning_rate * d_W
-            self.W0 -= self.learning_rate * d_W0
-            self.V -= self.learning_rate * d_V
-            self.V0 -= self.learning_rate * d_V0
+            self.backpropagate(O, t, X, H, net_z, net_u)
 
             #find the cost function
             if epoch % 10 == 0:
@@ -71,6 +57,22 @@ class NN:
                 costs.append(loss)
 
         return costs
+
+    def backpropagate(self, O, t, X, H, net_z, net_u):
+        error_output = O - t
+
+        d_W = H.T.dot(error_output * function_derivative(net_z))
+        d_W0 = np.sum(error_output * function_derivative(net_z), axis=0)
+
+        error_hidden_layer = error_output.dot(self.W.T) * function_derivative(net_u)
+        d_V = X.T.dot(error_hidden_layer)
+        d_V0 = np.sum(error_hidden_layer, axis=0)
+
+        # update weights and biases
+        self.W -= self.learning_rate * d_W
+        self.W0 -= self.learning_rate * d_W0
+        self.V -= self.learning_rate * d_V
+        self.V0 -= self.learning_rate * d_V0
 
     def predict(self, X):
         net_u = X.dot(self.V) + self.V0
@@ -91,7 +93,7 @@ def NET(set, test, n_hidden_neurons=5, title=""):
 
     plt.plot(cost)
     plt.title(f"{title} - Accuracy: {acc:.2f}")
-    plt.ylabel("Error")
+    plt.ylabel("Loss")
     plt.xlabel("Epochs")
     plt.show()
 
