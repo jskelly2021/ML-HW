@@ -25,7 +25,8 @@ def main():
     """
     plt.switch_backend("TkAgg")
     keras.utils.set_random_seed(42)
-    frameworks = [keras_dnn, torch_dnn]
+    # frameworks = [keras_dnn, torch_dnn]
+    frameworks = [keras_dnn]
     activations = ["relu", "tanh", "sigmoid"]
     optimizers = ["SGD", "Adam", "RMSprop"]
 

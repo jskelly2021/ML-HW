@@ -29,6 +29,8 @@ def make_regression_model(
     for _ in range(n_layers):
         model.add(keras.layers.Dense(n_neurons, activation=activation))
 
+    model.add(keras.layers.Dense(1))
+
     return model
 
 
@@ -138,8 +140,10 @@ def train_and_evaluate(
     history =  model.fit(
         X_train,
         y_train,
+        batch_size=batch_size,
         epochs=n_epochs,
-        batch_size=batch_size
+        verbose=0,
+        validation_data=(X_test, y_test)
     )
 
     loss, metrics = model.evaluate(X_test, y_test)
