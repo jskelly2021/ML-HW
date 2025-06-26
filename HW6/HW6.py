@@ -47,19 +47,34 @@ class NN:
             self.W.append(np.random.randn(layer_sizes[i], layer_sizes[i+1]))
             self.b.append(np.zeros(layer_sizes[i+1]))
 
+        print("---Initial Weights---")
+        print(self.W)
+
+
     def train(self, X, t, epochs=1000):
         costs = []
         for epoch in range(epochs):
             # forward pass
             nets, activations = self.forwardPass(X)
 
-            # backpropogation
+            # backpropagation
             self.backpropagate(t, nets, activations)
+
+
 
             # find the cost function
             if epoch % 10 == 0:
                 loss = np.square(np.subtract(t, activations[-1])).mean() 
                 costs.append(loss)
+        
+        print("---Nets---")
+        print(nets)
+
+        print("---Activations---")
+        print(activations)
+
+        print("---Final Weights---")
+        print(self.W)
 
         return costs
 
@@ -172,22 +187,22 @@ if __name__ == "__main__":
     set3_test = (X3_test, t3_test)
     set4_test = (X4_test, t4_test)
 
-    visualizeData(X1, t1, "Versicolor vs Virginica (sepal features)", ("Versicolor", "Virginica"))
-    visualizeData(X2, t2, "Setosa vs Virginica (petal features)", ("Setosa", "Virginica"))
+    # visualizeData(X1, t1, "Versicolor vs Virginica (sepal features)", ("Versicolor", "Virginica"))
+    # visualizeData(X2, t2, "Setosa vs Virginica (petal features)", ("Setosa", "Virginica"))
 
     # NET 1
-    NET(set1, set1_test, hidden_layers=[5], title="NET1: Versicolor vs Virginica (sepal features)")
-    NET(set2, set2_test, hidden_layers=[5], title="NET1: Setosa vs Virginica (petal features)")
+    # NET(set1, set1_test, hidden_layers=[5], title="NET1: Versicolor vs Virginica (sepal features)")
+    # NET(set2, set2_test, hidden_layers=[5], title="NET1: Setosa vs Virginica (petal features)")
 
-    # NET 2
-    NET(set1, set1_test, hidden_layers=[20], title="NET2: Versicolor vs Virginica (sepal features)")
-    NET(set2, set2_test, hidden_layers=[20], title="NET2: Setosa vs Virginica (petal features)")
+    # # NET 2
+    # NET(set1, set1_test, hidden_layers=[20], title="NET2: Versicolor vs Virginica (sepal features)")
+    # NET(set2, set2_test, hidden_layers=[20], title="NET2: Setosa vs Virginica (petal features)")
 
-    # NET 3
+    # # NET 3
     NET(set1, set1_test, hidden_layers=[10, 5], title="NET3: Versicolor vs Virginica (sepal features)")
-    NET(set2, set2_test, hidden_layers=[10, 5], title="NET3: Setosa vs Virginica (petal features)")
+    # NET(set2, set2_test, hidden_layers=[10, 5], title="NET3: Setosa vs Virginica (petal features)")
 
-    # NET 4
-    NET(set3, set3_test, hidden_layers=[5], title="NET4: Versicolor vs Virginica (all features)")
-    NET(set4, set4_test, hidden_layers=[5], title="NET4: Setosa vs Virginica (all features)")
+    # # NET 4
+    # NET(set3, set3_test, hidden_layers=[5], title="NET4: Versicolor vs Virginica (all features)")
+    # NET(set4, set4_test, hidden_layers=[5], title="NET4: Setosa vs Virginica (all features)")
 
