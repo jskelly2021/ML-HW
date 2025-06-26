@@ -23,7 +23,13 @@ def make_regression_model(
     Returns:
         keras.Sequential: A regression model with specified architecture
     """
-    return keras.Sequential()
+    model = keras.Sequential()
+    model.add(keras.Input(shape=(input_size,)))
+
+    for _ in range(n_layers):
+        model.add(keras.layers.Dense(n_neurons, activation=activation))
+
+    return model
 
 
 def make_classification_model(
@@ -46,7 +52,15 @@ def make_classification_model(
     Returns:
         keras.Sequential: A classification model with specified architecture and softmax output
     """
-    return keras.Sequential()
+    model = keras.Sequential()
+    model.add(keras.Input(shape=(input_size,)))
+
+    for _ in range(n_layers):
+        model.add(keras.layers.Dense(n_neurons, activation=activation))
+
+    model.add(keras.layers.Dense(n_classes, activation='softmax'))
+
+    return model
 
 
 def is_classification(model: keras.Sequential) -> bool:
@@ -59,7 +73,28 @@ def is_classification(model: keras.Sequential) -> bool:
     Returns:
         bool: True if the model is for classification, False otherwise
     """
-    return False
+    model
+    output_config = model.layers[-1].get_config()
+
+    return output_config.get('activation') == 'softmax'
+
+
+def get_compilation_params(opt, lr, model):
+    if opt == 'SGD':
+        optimizer = keras.optimizers.SGD(learning_rate=lr)
+    elif opt == 'Adam':
+        optimizer = keras.optimizers.Adam(learning_rate=lr)
+    else:
+        optimizer = keras.optimizers.RMSprop(learning_rate=lr)
+
+    if is_classification(model):
+        loss = 'categorical_crossentropy'
+        metrics = 'accuracy'
+    else:
+        loss = 'mean_squared_error'
+        metrics = 'mean_squared_error'
+
+    return optimizer, loss, metrics
 
 
 def train_and_evaluate(
@@ -70,7 +105,9 @@ def train_and_evaluate(
     model: keras.Sequential,
     optimizer: str,
     learning_rate: float = 0.01,
-) -> [np.ndarray, float, float, dict]:
+    n_epochs: int = 100,
+    batch_size: int = 64,
+) -> tuple[np.ndarray, float, float, dict]:
     """
     Train and evaluate a Keras model.
 
@@ -90,4 +127,22 @@ def train_and_evaluate(
             - float: Test metric (MSE for regression, accuracy for classification)
             - dict: Training history containing loss and metrics
     """
-    return np.array([]), 0, 0, {}
+    model_optimizer, model_loss, model_metrics = get_compilation_params(optimizer, learning_rate, model)
+
+    model.compile(
+        optimizer=model_optimizer,
+        loss=model_loss,
+        metrics=[model_metrics]
+    )
+
+    history =  model.fit(
+        X_train,
+        y_train,
+        epochs=n_epochs,
+        batch_size=batch_size
+    )
+
+    loss, metrics = model.evaluate(X_test, y_test)
+    preds = model.predict(X_test)
+
+    return np.array(preds), loss, metrics, history.history
