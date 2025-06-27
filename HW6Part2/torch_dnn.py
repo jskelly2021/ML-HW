@@ -15,7 +15,14 @@ def get_activation(activation: str):
     Returns:
         torch.nn.Module: The corresponding PyTorch activation function
     """
-    return torch.nn.Module()
+    if activation == 'tanh':
+        module = torch.nn.Tanh()
+    elif activation == 'sigmoid':
+        module = torch.nn.Sigmoid()
+    else:
+        module = torch.nn.ReLU()
+
+    return module
 
 
 def make_regression_model(
@@ -36,7 +43,17 @@ def make_regression_model(
     Returns:
         torch.nn.Sequential: A regression model with specified architecture
     """
-    return torch.nn.Sequential()
+    layers = []
+    layers.append(torch.nn.Linear(input_size, n_neurons))
+    layers.append(get_activation(activation))
+
+    for _ in range(n_layers - 1):
+        layers.append(torch.nn.Linear(n_neurons, n_neurons))
+        layers.append(get_activation(activation))
+
+    layers.append(torch.nn.Linear(n_neurons, 1))
+
+    return torch.nn.Sequential(*layers)
 
 
 def make_classification_model(
@@ -59,7 +76,17 @@ def make_classification_model(
     Returns:
         torch.nn.Sequential: A classification model with specified architecture and softmax output
     """
-    return torch.nn.Sequential()
+    layers = []
+    layers.append(torch.nn.Linear(input_size, n_neurons))
+    layers.append(get_activation(activation))
+
+    for _ in range(n_layers - 1):
+        layers.append(torch.nn.Linear(n_neurons, n_neurons))
+        layers.append(get_activation(activation))
+
+    layers.append(torch.nn.Softmax(n_neurons, n_classes))
+
+    return torch.nn.Sequential(*layers)
 
 
 def train_epoch(
@@ -140,7 +167,14 @@ def get_dataloaders(
     Returns:
         tuple: (train_loader, test_loader) containing DataLoader objects for training and test data
     """
-    return None, None
+
+    train_dataset = torch.utils.data.TensorDataset(torch.from_numpy(x_train), torch.from_numpy(y_train))
+    test_dataset = torch.utils.data.TensorDataset(torch.from_numpy(x_test), torch.from_numpy(y_test))
+
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=BATCH_SIZE)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=BATCH_SIZE)
+
+    return train_loader, test_loader
 
 
 def train_and_evaluate(

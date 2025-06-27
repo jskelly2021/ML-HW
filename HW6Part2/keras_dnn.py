@@ -107,8 +107,6 @@ def train_and_evaluate(
     model: keras.Sequential,
     optimizer: str,
     learning_rate: float = 0.01,
-    n_epochs: int = 100,
-    batch_size: int = 64,
 ) -> tuple[np.ndarray, float, float, dict]:
     """
     Train and evaluate a Keras model.
@@ -140,8 +138,8 @@ def train_and_evaluate(
     history =  model.fit(
         X_train,
         y_train,
-        batch_size=batch_size,
-        epochs=n_epochs,
+        batch_size=BATCH_SIZE,
+        epochs=EPOCHS,
         verbose=0,
         validation_data=(X_test, y_test)
     )
