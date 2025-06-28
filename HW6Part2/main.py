@@ -25,9 +25,9 @@ def main():
     """
     plt.switch_backend("TkAgg")
     keras.utils.set_random_seed(42)
-    # frameworks = [keras_dnn, torch_dnn]
+    frameworks = [keras_dnn, torch_dnn]
     # frameworks = [keras_dnn]
-    frameworks = [torch_dnn]
+    # frameworks = [torch_dnn]
     activations = ["relu", "tanh", "sigmoid"]
     optimizers = ["SGD", "Adam", "RMSprop"]
 
@@ -176,7 +176,7 @@ def plot_history(
 
     if show:
         plt.show()
-    plt.savefig(f"./graphs/history/history_{plt_type}_{framework}_{activation}_{optimizer}.png")
+    plt.savefig(f"./graphs/{framework}/history_{plt_type}_{framework}_{activation}_{optimizer}.png")
     plt.close()
 
 
@@ -225,7 +225,7 @@ def plot_predictions(
 
     if show:
         plt.show()
-    plt.savefig(f"./graphs/predictions/predictions_{plt_type}_{framework}_{activation}_{optimizer}.png")
+    plt.savefig(f"./graphs/{framework}/predictions_{plt_type}_{framework}_{activation}_{optimizer}.png")
     plt.close()
 
 

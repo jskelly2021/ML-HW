@@ -189,7 +189,7 @@ def is_classification(model: torch.nn.Sequential) -> bool:
     Returns:
         bool: True if the model is for classification, False otherwise
     """
-    return model[-1] == torch.nn.Softmax
+    return isinstance(model[-1], torch.nn.Softmax)
 
 
 
