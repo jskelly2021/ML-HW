@@ -25,9 +25,9 @@ def main():
     """
     plt.switch_backend("TkAgg")
     keras.utils.set_random_seed(42)
-    # frameworks = [keras_dnn, torch_dnn]
+    frameworks = [keras_dnn, torch_dnn]
     # frameworks = [keras_dnn]
-    frameworks = [torch_dnn]
+    # frameworks = [torch_dnn]
     activations = ["relu", "tanh", "sigmoid"]
     optimizers = ["SGD", "Adam", "RMSprop"]
 
@@ -39,7 +39,6 @@ def main():
     )
     reg_y_train = reg_y_train.reshape(-1, 1)
     reg_y_test = reg_y_test.reshape(-1, 1)
-
 
     cls_x_train, cls_x_test, cls_y_train, cls_y_test = load_and_preprocess_data("iris")
     classification_models = get_classification_models(

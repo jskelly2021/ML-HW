@@ -130,8 +130,6 @@ def train_epoch(
     else:
         epoch_accuracy = epoch_loss
 
-    print(epoch_loss)
-
     return epoch_loss, epoch_accuracy
 
 
@@ -274,7 +272,7 @@ def train_and_evaluate(
 
     for _ in range(EPOCHS):
         train_loss, train_accuracy = train_epoch(model, model_optimizer, model_loss, train_loader, is_class)
-        test_loss, test_accuracy, _ = evaluate_epoch(model, model_loss, test_loader, is_class)
+        test_loss, test_accuracy, preds = evaluate_epoch(model, model_loss, test_loader, is_class)
 
         history["loss"].append(train_loss)
         history["val_loss"].append(test_loss)
