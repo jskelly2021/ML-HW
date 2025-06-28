@@ -130,6 +130,8 @@ def train_epoch(
     else:
         epoch_accuracy = epoch_loss
 
+    print(epoch_loss)
+
     return epoch_loss, epoch_accuracy
 
 
