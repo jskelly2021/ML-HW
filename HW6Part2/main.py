@@ -25,9 +25,9 @@ def main():
     """
     plt.switch_backend("TkAgg")
     keras.utils.set_random_seed(42)
-    frameworks = [keras_dnn, torch_dnn]
+    # frameworks = [keras_dnn, torch_dnn]
     # frameworks = [keras_dnn]
-    # frameworks = [torch_dnn]
+    frameworks = [torch_dnn]
     activations = ["relu", "tanh", "sigmoid"]
     optimizers = ["SGD", "Adam", "RMSprop"]
 
@@ -37,6 +37,9 @@ def main():
     regression_models = get_regression_models(
         reg_x_train.shape[1], frameworks, activations, optimizers
     )
+    reg_y_train = reg_y_train.reshape(-1, 1)
+    reg_y_test = reg_y_test.reshape(-1, 1)
+
 
     cls_x_train, cls_x_test, cls_y_train, cls_y_test = load_and_preprocess_data("iris")
     classification_models = get_classification_models(
@@ -150,8 +153,10 @@ def plot_history(
     Returns:
         None: Saves the plot to a file and optionally displays it
     """
-    plt.figure(figsize=(12, 4))
-    plt.subplot(1, 2, 1)
+    if is_classification:
+        plt.figure(figsize=(12, 4))
+        plt.subplot(1, 2, 1)
+
     plt.plot(history["loss"], label="Train Loss")
     plt.plot(history["val_loss"], label="Validation Loss")
     plt.title(f"Loss: {activation} activation, {optimizer} optimizer")
@@ -159,20 +164,17 @@ def plot_history(
     plt.ylabel("Loss")
     plt.legend()
 
-    plt.subplot(1, 2, 2)
-    plt_type = "regression"
     if is_classification:
+        plt.subplot(1, 2, 2)
         plt_type = "classification"
         plt.plot(history["accuracy"], label="Train Accuracy")
         plt.plot(history["val_accuracy"], label="Validation Accuracy")
         plt.ylabel("Accuracy")
+        plt.title(f"Metric: {activation} activation, {optimizer} optimizer")
+        plt.xlabel("Epochs")
+        plt.legend()
     else:
-        plt.plot(history["loss"], label="Train Loss")
-        plt.plot(history["val_loss"], label="Validation Loss")
-        plt.ylabel("MSE")
-    plt.title(f"Metric: {activation} activation, {optimizer} optimizer")
-    plt.xlabel("Epochs")
-    plt.legend()
+        plt_type = "regression"
 
     if show:
         plt.show()

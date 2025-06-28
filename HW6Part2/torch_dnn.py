@@ -122,7 +122,7 @@ def train_epoch(
 
         epoch_loss += loss.item() * len(X)
         if classification:
-            correct += (pred.argmax(1) == y).type(torch.float).sum().item()
+            correct += (pred.argmax(1) == y.argmax(1)).type(torch.float).sum().item()
 
     epoch_loss = epoch_loss / len(train_loader.dataset)
     if classification:
@@ -164,7 +164,7 @@ def evaluate_epoch(
             val_loss += loss_fn(pred, y).item() * len(X)
 
             if classification:
-                correct += (pred.argmax(1) == y).type(torch.float).sum().item()
+                correct += (pred.argmax(1) == y.argmax(1)).type(torch.float).sum().item()
 
             preds.append(pred)
 
@@ -189,8 +189,7 @@ def is_classification(model: torch.nn.Sequential) -> bool:
     Returns:
         bool: True if the model is for classification, False otherwise
     """
-    return isinstance(model[-1], torch.nn.Softmax)
-
+    return model[-1].out_features > 1
 
 
 def get_dataloaders(
