@@ -85,6 +85,7 @@ def make_classification_model(
         layers.append(get_activation(activation))
 
     layers.append(torch.nn.Linear(n_neurons, n_classes))
+    layers.append(torch.nn.Softmax(dim=1))
 
     return torch.nn.Sequential(*layers)
 
@@ -120,7 +121,7 @@ def train_epoch(
         optimizer.step()
         optimizer.zero_grad()
 
-        epoch_loss += loss.item() * len(X)
+        epoch_loss += loss.item()
         if classification:
             correct += (pred.argmax(1) == y.argmax(1)).type(torch.float).sum().item()
 
@@ -161,7 +162,7 @@ def evaluate_epoch(
     with torch.no_grad():
         for X, y in test_loader:
             pred = model(X)
-            val_loss += loss_fn(pred, y).item() * len(X)
+            val_loss += loss_fn(pred, y).item()
 
             if classification:
                 correct += (pred.argmax(1) == y.argmax(1)).type(torch.float).sum().item()
@@ -189,7 +190,7 @@ def is_classification(model: torch.nn.Sequential) -> bool:
     Returns:
         bool: True if the model is for classification, False otherwise
     """
-    return model[-1].out_features > 1
+    return isinstance(model[-1], torch.nn.Softmax)
 
 
 def get_dataloaders(
