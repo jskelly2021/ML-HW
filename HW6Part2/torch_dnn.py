@@ -282,4 +282,7 @@ def train_and_evaluate(
 
     test_loss, test_accuracy, preds = evaluate_epoch(model, model_loss, test_loader, is_class)
 
+    print("Test Loss: ", test_loss)
+    print("Test Accuracy: ", test_accuracy)
+
     return np.array(preds), test_loss, test_accuracy, history
