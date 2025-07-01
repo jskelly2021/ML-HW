@@ -121,7 +121,7 @@ def train_epoch(
         optimizer.step()
         optimizer.zero_grad()
 
-        epoch_loss += loss.item() * len(X)
+        epoch_loss += loss.item()
         if classification:
             correct += (pred.argmax(1) == y.argmax(1)).type(torch.float).sum().item()
 
@@ -162,7 +162,7 @@ def evaluate_epoch(
     with torch.no_grad():
         for X, y in test_loader:
             pred = model(X)
-            val_loss += loss_fn(pred, y).item()  * len(X)
+            val_loss += loss_fn(pred, y).item()
 
             if classification:
                 correct += (pred.argmax(1) == y.argmax(1)).type(torch.float).sum().item()
@@ -281,8 +281,5 @@ def train_and_evaluate(
         history["val_accuracy"].append(test_accuracy)
 
     test_loss, test_accuracy, preds = evaluate_epoch(model, model_loss, test_loader, is_class)
-
-    print("Test Loss: ", test_loss)
-    print("Test Accuracy: ", test_accuracy)
 
     return np.array(preds), test_loss, test_accuracy, history
