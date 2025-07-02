@@ -130,6 +130,13 @@ def make_cnn_classification_model(
     kernel_size: int,
     padding: int,
 ) -> torch.nn.Sequential:
+    """
+        This function should return a sequential model with n_layers of 
+            (Conv2d(stride=1)->ReLU-MaxPool2d(kernel_size=2, stride=2)).
+
+        Follow this with a single Linear layer taking the output of 
+            the convolutional layers and returning "n_classes".
+    """
     model = torch.nn.Sequential()
 
     # TODO: Implement this function
