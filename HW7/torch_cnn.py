@@ -137,11 +137,18 @@ def make_cnn_classification_model(
     kernel_size: int,
     padding: int,
 ) -> torch.nn.Sequential:
-    model = torch.nn.Sequential()
-
     # TODO: Implement this function
+    layers = []
 
-    return model
+    for i in range(n_layers):
+        layers.append(torch.nn.Conv2d(stride=1))
+        layers.append(torch.nn.ReLU)
+        layers.append(torch.nn.MaxPool2d(kernel_size=2, stride=2))
+
+    conv_output_size = get_flat_size(input_shape, n_layers, filter_size, kernel_size, padding)
+    layers.append(torch.nn.Linear(conv_output_size, n_classes))
+
+    return torch.nn.Sequential(*layers)
 
 
 def train_epoch(
