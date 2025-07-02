@@ -173,6 +173,7 @@ def make_cnn_classification_model(
 
     layers.append(torch.nn.Flatten())
     layers.append(torch.nn.Linear(conv_output_size, n_classes))
+    layers.append(torch.nn.ReLU())
 
     return torch.nn.Sequential(*layers)
 
