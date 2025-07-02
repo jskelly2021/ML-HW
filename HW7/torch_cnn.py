@@ -118,8 +118,15 @@ def get_flat_size(
     Returns:
         int: Size of flattened output
     """
-    # TODO: Implement this function
-    return 0
+    C = filter_size
+    H = input_shape[1]
+    W = input_shape[2]
+
+    for i in range(n_layers):
+        H = (H - kernel_size + 2 * padding) + 1
+        W = (W - kernel_size + 2 * padding) + 1
+
+    return C * H * W
 
 
 def make_cnn_classification_model(
@@ -204,7 +211,7 @@ def plot_history(
 
     if show:
         plt.show()
-    plt.savefig(f"{name}.png")
+    plt.savefig(f"graphs/{name}.png")
     plt.close()
 
 
@@ -214,7 +221,7 @@ def train_and_evaluate(
     model: torch.nn.Sequential,
     optimizer: str,
     learning_rate: float = 0.01,
-) -> [np.ndarray, float, float, dict]:
+) -> tuple[np.ndarray, float, float, dict]:
     history = {"loss": [], "val_loss": [], "accuracy": [], "val_accuracy": []}
 
     loss_fn = torch.nn.CrossEntropyLoss()
