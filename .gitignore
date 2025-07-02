@@ -2,3 +2,4 @@
 __pycache__/
 *.pyc
 HW7/data
+venv-gpu

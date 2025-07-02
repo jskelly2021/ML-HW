@@ -6,6 +6,9 @@ import torch
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(f"Using device: {device}")
+
 BATCH_SIZE = 32
 EPOCHS = 10
 SEED = 42
@@ -92,6 +95,7 @@ def train_and_plot(
     model = make_cnn_classification_model(
         input_shape, 2, 10, filter_size, kernel_size, padding
     )
+    model.to(device)
     y_pred, test_loss, test_metric, history = train_and_evaluate(
         train_loader, val_loader, model, "Adam", learning_rate=0.001
     )
@@ -183,6 +187,9 @@ def train_epoch(
     epoch_loss = 0
     epoch_accuracy = 0
     for X_batch, y_batch in train_loader:
+        X_batch = X_batch.to(device)
+        y_batch = y_batch.to(device)
+
         optimizer.zero_grad()
         y_pred = model(X_batch)
         loss = loss_fn(y_pred, y_batch)
