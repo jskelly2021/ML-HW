@@ -6,6 +6,8 @@ import torch
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 
+import time
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 
@@ -22,9 +24,9 @@ best_padding = 0
 
 def main():
     # TODO: Complete make_cnn_classification_model and get_flat_size, choose hyperparameters here
-    filter_sizes = []
-    kernel_sizes = []
-    paddings = []
+    filter_sizes = [4, 16, 32, 64]
+    kernel_sizes = [1, 3, 5]
+    paddings = [0, 1, 2]
 
     # Env setup
     plt.switch_backend("TkAgg")
@@ -90,6 +92,7 @@ def train_and_plot(
     kernel_size: int,
     padding: int,
 ):
+    start = time.time()
     name = f"filter_{filter_size}_kernel_{kernel_size}_padding_{padding}"
     print(f"Training {name}")
     model = make_cnn_classification_model(
@@ -100,6 +103,10 @@ def train_and_plot(
         train_loader, val_loader, model, "Adam", learning_rate=0.001
     )
     plot_history(history, name)
+
+    end = time.time()
+    print(f"Training time: {(end - start):.2f} seconds")
+
 
 
 def get_flat_size(
