@@ -12,9 +12,9 @@ SEED = 42
 
 
 # TODO: Set your best configuration
-best_filter_size = None
-best_kernel_size = None
-best_padding = None
+best_filter_size = 16
+best_kernel_size = 4
+best_padding = 0
 
 
 def main():
@@ -126,6 +126,9 @@ def get_flat_size(
         H = (H - kernel_size + 2 * padding) + 1
         W = (W - kernel_size + 2 * padding) + 1
 
+        H = H // 2
+        W = W // 2
+
     return C * H * W
 
 
@@ -137,15 +140,29 @@ def make_cnn_classification_model(
     kernel_size: int,
     padding: int,
 ) -> torch.nn.Sequential:
-    # TODO: Implement this function
-    layers = []
+    """
+        This function should return a sequential model with n_layers of 
+            (Conv2d(stride=1)->ReLU-MaxPool2d(kernel_size=2, stride=2)).
 
-    for i in range(n_layers):
-        layers.append(torch.nn.Conv2d(stride=1))
-        layers.append(torch.nn.ReLU)
+        Follow this with a single Linear layer taking the output of 
+            the convolutional layers and returning "n_classes".
+    """
+    layers = []
+    C = input_shape[0]
+
+    for _ in range(n_layers):
+        layers.append(torch.nn.Conv2d(in_channels=C,
+                                      out_channels=filter_size,
+                                      kernel_size=kernel_size,
+                                      stride=1,
+                                      padding=padding))
+        layers.append(torch.nn.ReLU())
         layers.append(torch.nn.MaxPool2d(kernel_size=2, stride=2))
+        C = filter_size
 
     conv_output_size = get_flat_size(input_shape, n_layers, filter_size, kernel_size, padding)
+
+    layers.append(torch.nn.Flatten())
     layers.append(torch.nn.Linear(conv_output_size, n_classes))
 
     return torch.nn.Sequential(*layers)
