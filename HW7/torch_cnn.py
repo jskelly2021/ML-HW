@@ -129,6 +129,8 @@ def get_flat_size(
         H = H // 2
         W = W // 2
 
+        C = filter_size * (2 ** i)
+
     return C * H * W
 
 
@@ -148,17 +150,20 @@ def make_cnn_classification_model(
             the convolutional layers and returning "n_classes".
     """
     layers = []
-    C = input_shape[0]
+    in_channels = input_shape[0]
 
-    for _ in range(n_layers):
-        layers.append(torch.nn.Conv2d(in_channels=C,
-                                      out_channels=filter_size,
+    for i in range(n_layers):
+        out_channels = filter_size * (2 ** i)
+
+        layers.append(torch.nn.Conv2d(in_channels=in_channels,
+                                      out_channels=out_channels,
                                       kernel_size=kernel_size,
                                       stride=1,
                                       padding=padding))
         layers.append(torch.nn.ReLU())
         layers.append(torch.nn.MaxPool2d(kernel_size=2, stride=2))
-        C = filter_size
+
+        in_channels = out_channels
 
     conv_output_size = get_flat_size(input_shape, n_layers, filter_size, kernel_size, padding)
 
