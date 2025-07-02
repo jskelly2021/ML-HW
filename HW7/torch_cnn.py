@@ -187,8 +187,8 @@ def train_epoch(
     epoch_loss = 0
     epoch_accuracy = 0
     for X_batch, y_batch in train_loader:
-        X_batch = X_batch.to(device)
-        y_batch = y_batch.to(device)
+        X_batch = X_batch.to(device, non_blocking=True)
+        y_batch = y_batch.to(device, non_blocking=True)
 
         optimizer.zero_grad()
         y_pred = model(X_batch)
@@ -212,10 +212,13 @@ def evaluate_epoch(
     predictions = []
     with torch.no_grad():
         for X_batch, y_batch in test_loader:
+            X_batch = X_batch.to(device, non_blocking=True)
+            y_batch = y_batch.to(device, non_blocking=True)
+
             y_pred = model(X_batch)
             loss = loss_fn(y_pred, y_batch)
             val_loss += loss.item()
-            predictions.append(y_pred.detach().numpy())
+            predictions.append(y_pred.detach().cpu().numpy())
             val_accuracy += (y_pred.argmax(dim=1) == y_batch).sum().item()
     val_loss /= len(test_loader)
     val_accuracy /= len(test_loader.dataset)
