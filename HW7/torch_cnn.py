@@ -17,9 +17,9 @@ SEED = 42
 
 
 # TODO: Set your best configuration
-best_filter_size = 16
-best_kernel_size = 4
-best_padding = 0
+best_filter_size = 64
+best_kernel_size = 3
+best_padding = 1
 
 results = []
 
@@ -27,9 +27,9 @@ def main():
     print(f"Using device: {device}")
 
     # TODO: Complete make_cnn_classification_model and get_flat_size, choose hyperparameters here
-    filter_sizes = [4, 16, 32, 64]
-    kernel_sizes = [1, 3, 5]
-    paddings = [0, 1]
+    filter_sizes = [64, 4]
+    kernel_sizes = [3, 5]
+    paddings = [1]
 
     # Env setup
     plt.switch_backend("TkAgg")
@@ -77,14 +77,14 @@ def main():
                     padding,
                 )
 
-    train_and_plot(
-        train_loader,
-        val_loader,
-        input_shape,
-        best_filter_size,
-        best_kernel_size,
-        best_padding,
-    )
+    # train_and_plot(
+    #     train_loader,
+    #     val_loader,
+    #     input_shape,
+    #     best_filter_size,
+    #     best_kernel_size,
+    #     best_padding,
+    # )
 
     df_results = pd.DataFrame(results)
     df_results = df_results.sort_values("Val Accuracy (Final)", ascending=False)
@@ -193,11 +193,16 @@ def make_cnn_classification_model(
         layers.append(torch.nn.ReLU())
         layers.append(torch.nn.MaxPool2d(kernel_size=2, stride=2))
 
+        layers.append(torch.nn.Dropout2d(p=.3))
+
         in_channels = out_channels
 
     conv_output_size = get_flat_size(input_shape, n_layers, filter_size, kernel_size, padding)
 
     layers.append(torch.nn.Flatten())
+
+    layers.append(torch.nn.Dropout(p=.3))
+
     layers.append(torch.nn.Linear(conv_output_size, n_classes))
     layers.append(torch.nn.ReLU())
 
@@ -277,7 +282,7 @@ def plot_history(
 
     if show:
         plt.show()
-    plt.savefig(f"graphs/{name}.png")
+    plt.savefig(f"graphs/{name}_dropout.png")
     plt.close()
 
 
