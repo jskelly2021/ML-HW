@@ -1,5 +1,6 @@
 import random
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 
 import torch
@@ -9,7 +10,6 @@ from torchvision import datasets, transforms
 import time
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print(f"Using device: {device}")
 
 BATCH_SIZE = 32
 EPOCHS = 10
@@ -21,12 +21,15 @@ best_filter_size = 16
 best_kernel_size = 4
 best_padding = 0
 
+results = []
 
 def main():
+    print(f"Using device: {device}")
+
     # TODO: Complete make_cnn_classification_model and get_flat_size, choose hyperparameters here
     filter_sizes = [4, 16, 32, 64]
     kernel_sizes = [1, 3, 5]
-    paddings = [0, 1, 2]
+    paddings = [0, 1]
 
     # Env setup
     plt.switch_backend("TkAgg")
@@ -58,8 +61,8 @@ def main():
     )
 
     # Define data loaders
-    train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
-    val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False)
+    train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, pin_memory=True)
+    val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, pin_memory=True)
     input_shape = train_dataset[0][0].shape
 
     for filter_size in filter_sizes:
@@ -83,6 +86,11 @@ def main():
         best_padding,
     )
 
+    df_results = pd.DataFrame(results)
+    df_results = df_results.sort_values("Val Accuracy (Final)", ascending=False)
+    df_results.to_csv("cnn_training_results.csv", index=False)
+    print(df_results)
+
 
 def train_and_plot(
     train_loader: DataLoader,
@@ -102,10 +110,21 @@ def train_and_plot(
     y_pred, test_loss, test_metric, history = train_and_evaluate(
         train_loader, val_loader, model, "Adam", learning_rate=0.001
     )
-    plot_history(history, name)
 
     end = time.time()
-    print(f"Training time: {(end - start):.2f} seconds")
+    train_time = end - start
+    print(f"Training time: {train_time:.2f} seconds")
+
+    plot_history(history, name)
+
+    results.append({
+        "Model": name,
+        "Train Loss (Final)": history["loss"][-1],
+        "Val Loss (Final)": history["val_loss"][-1],
+        "Train Accuracy (Final)": history["accuracy"][-1],
+        "Val Accuracy (Final)": history["val_accuracy"][-1],
+        "Time (s)": train_time
+    })
 
 
 
